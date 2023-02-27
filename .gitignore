@@ -1,0 +1,4 @@
+dist
+gen
+*.egg-info
+push.sh
