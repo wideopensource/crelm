@@ -1,6 +1,7 @@
 import os
 import pexpect
 from typing import List, TypeVar
+from os.path import dirname, realpath
 
 from cffi import FFI
 
@@ -12,12 +13,14 @@ class Tube:
         self._name = name
 
         self._source_folder = '.'
+        self._target_folder = None
         self._imports = []
         self._header_filenames = []
         self._source_filenames = []
         self._macros = []
         self._lib_path = None
         self._gen_foldername = 'gen'
+        self._verbose = True
 
     def _make_fullpath(self, filename: str) -> str:
         return os.path.join(self._source_folder, filename)
@@ -67,6 +70,10 @@ class Tube:
         self._source_folder = folder
         return self
 
+    def set_source_folder_from(self, filename: str):
+        self.set_source_folder(dirname(realpath(filename)))
+        return self
+
     def add_header(self, filename: str) -> TSelf:
         fullpath = self._make_fullpath(filename)
         self._header_filenames.append(fullpath)
@@ -91,6 +98,18 @@ class Tube:
         self._macros.append(macro)
         return self
 
+    def new(self, typename: str):
+        return self._ffi.new(f"{typename} *")
+
+    class Paste:
+        def __init__(self, tube: TSelf):
+            self._tube = tube
+
+            self.new = tube.new
+
+            for attr in dir(tube._lib):
+                self.__setattr__(attr, getattr(tube._lib, attr))
+
     def squeeze(self) -> TSelf:
         if 0 == len(self._header_filenames):
             raise RuntimeError("No headers specified")
@@ -113,9 +132,15 @@ class Tube:
                               )
 
         self._lib_path = ffibuilder.compile(
-            tmpdir=self._gen_foldername, verbose=True)
+            tmpdir=self._gen_foldername,
+            verbose=self._verbose)
 
         from sys import path
         path.append(self._gen_foldername)
 
-        return self
+        import importlib
+        self._module = importlib.import_module(f"{self._name}")
+        self._lib = self._module.lib
+        self._ffi = self._module.ffi
+
+        return Tube.Paste(self)
