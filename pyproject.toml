@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crelm"
-version = "0.0.14"
+version = "0.0.16"
 authors = [
   { name="WideOpenTech", email="foss@wideopentech.co.uk" },
 ]

@@ -36,7 +36,6 @@ class Tube:
         macros = ' '.join([f'-D{macro}' for macro in self._macros])
 
         command = f'gcc -w -E {macros} {headers}'
-        print(command)
 
         output, status = pexpect.run(command, withexitstatus=True)
         if status != 0:
@@ -47,6 +46,8 @@ class Tube:
         self._cdef = '\n'.join(
             [line.strip() for line in lines if not line.startswith('#')]).strip()
 
+        print(f"preproc: {command} -> {self._cdef}")
+
         return True
 
     def _build_headers(self) -> str:
@@ -56,14 +57,17 @@ class Tube:
 
     def _build_defines(self) -> str:
 
-        lines = [
-            f'#define {x[0]} {x[1] if len(x) > 1 else ""}' for x in [m.split('=') for m in self._macros]]
+        lines = []
+        # f'#define {x[0]} {x[1] if len(x) > 1 else ""}' for x in [m.split('=') for m in self._macros]]
 
         return '\n'.join(lines)
 
     def _build_compiler_args(self) -> List[str]:
         args = []
-        # args.append([f'-D{x}' for x in self._macros])
+        args += [f'-D{x}' for x in self._macros]
+        args.append('-save-temps=obj')
+
+        print(args)
         return args
 
     def set_source_folder(self, folder: str):
@@ -98,6 +102,16 @@ class Tube:
         self._macros.append(macro)
         return self
 
+    def add_macros(self, macros: List[str]) -> TSelf:
+        for macro in macros:
+            self._macros.append(macro)
+        return self
+
+    def add_macro_if(self, predicate: bool, macro: str) -> TSelf:
+        if predicate:
+            self._macros.append(macro)
+        return self
+
     def new(self, typename: str):
         return self._ffi.new(f"{typename} *")
 
@@ -110,7 +124,7 @@ class Tube:
             for attr in dir(tube._lib):
                 self.__setattr__(attr, getattr(tube._lib, attr))
 
-    def squeeze(self) -> TSelf:
+    def build(self) -> TSelf:
         if 0 == len(self._header_filenames):
             raise RuntimeError("No headers specified")
 
@@ -119,6 +133,8 @@ class Tube:
 
         if not self._build_cdef():
             raise RuntimeError(f"Failed to generate cdef ({self._cdef})")
+
+        print(self._build_defines())
 
         ffibuilder = FFI()
         ffibuilder.cdef(self._cdef)
@@ -135,12 +151,15 @@ class Tube:
             tmpdir=self._gen_foldername,
             verbose=self._verbose)
 
+        return self
+
+    def squeeze(self) -> TSelf:
         from sys import path
         path.append(self._gen_foldername)
 
         import importlib
-        self._module = importlib.import_module(f"{self._name}")
-        self._lib = self._module.lib
-        self._ffi = self._module.ffi
+        module = importlib.import_module(f"{self._name}")
+        self._lib = module.lib
+        self._ffi = module.ffi
 
         return Tube.Paste(self)
