@@ -11,6 +11,7 @@
 struct infinite_series_state_t {
   unsigned long number_of_iterations_completed;
   ACCUMULATOR_T accumulator;
+  ACCUMULATOR_T temp;
 };
 
 void infinite_series_init(struct infinite_series_state_t *state);

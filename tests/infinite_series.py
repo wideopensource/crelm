@@ -7,6 +7,10 @@ class BigNumbers:
     def billions(how_many: float) -> int:
         return int(how_many * 1000 * 1000 * 1000)
 
+    @staticmethod
+    def millions(how_many: float) -> int:
+        return int(how_many * 1000 * 1000)
+
 
 class PlotAxis:
     def __init__(self, min: int, max: int, number_of_points: int):
@@ -44,6 +48,7 @@ class InfiniteSeries:
         self._reference = reference
 
         self.result = None
+        self.diff = None
         self.elapsed_seconds = None
 
     def init(self):
@@ -51,14 +56,18 @@ class InfiniteSeries:
         self.result = []
         return self
 
-    def run(self):
+    def _run(self):
         for x in self._xaxis:
             p = self._paste.infinite_series_run(self._state, int(x))
             self.result.append(p)
         return self
 
-    def run_timed(self):
-        self.elapsed_seconds = round(timeit(stmt=self.run, number=1), 3)
+    def run(self):
+        self.elapsed_seconds = round(timeit(stmt=self._run, number=1), 3)
+        return self
+
+    def analyse(self):
+        self.diff = [abs(x - self._reference) for x in self.result]
         return self
 
     def report(self):
