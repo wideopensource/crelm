@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "crelm"
+version = "0.0.27"
+description = "Utility that automates turning simple C classes into Python objects"
+authors = [
+  "WideOpenTech <foss@wideopentech.co.uk>",
+]
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/wideopentech-public/crelm"
+"Bug Tracker" = "https://github.com/wideopentech-public/crelm/issues"
+
+
+[tool.poetry.dependencies]
+python = "^3.8"
+cffi = "^1.15.1"
+pexpect = "^4.8.0"
+john = "^0.1.1a2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
