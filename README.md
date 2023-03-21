@@ -7,7 +7,7 @@ pip3 install crelm
 
 ### Simple Demo
 
-`
+```
 from crelm import Factory
 
 paste = Factory(debug=False, verbose=True).create_Tube('add2') \
@@ -15,4 +15,4 @@ paste = Factory(debug=False, verbose=True).create_Tube('add2') \
     .squeeze()
 
 print(f'2 + 3 = {paste.add2(2, 3)}')
-`
+```
