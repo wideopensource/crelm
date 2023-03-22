@@ -11,6 +11,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+repository = "https://github.com/wideopensource/crelm"
 
 [project.urls]
 "Homepage" = "https://github.com/wideopentech-public/crelm"
