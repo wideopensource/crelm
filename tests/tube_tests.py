@@ -137,6 +137,26 @@ class TestPasteWithFiles(TestCase, Factory):
         self.assertEqual(1, actual1)
         self.assertEqual(2, actual2)
 
+    def test_source_files_with_headers_separate(self):
+        header1 = self.writeFile('test1.h', 'int test1_file();')
+        source1 = self.writeFile('test1.c', 'int test1_file() { return 1; }')
+
+        header2 = self.writeFile('test2.h', 'int test2_file();')
+        source2 = self.writeFile('test2.c', 'int test2_file() { return 2; }')
+
+        sut = self.create_Tube(self.testName) \
+            .add_header_file(header1) \
+            .add_source_file(source1) \
+            .add_header_file(header2) \
+            .add_source_file(source2) \
+            .squeeze()
+
+        actual1 = sut.test1_file()
+        actual2 = sut.test2_file()
+
+        self.assertEqual(1, actual1)
+        self.assertEqual(2, actual2)
+
 
 class TestMacros(TestCase, Factory):
 
