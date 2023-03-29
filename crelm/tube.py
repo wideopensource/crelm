@@ -118,10 +118,15 @@ class Tube:
 
     def _preprocess_headers(self) -> str:
 
-        headers = ' '.join(
-            [f'{x}' for x in self._header_filenames])
+        headers = '\n'.join(
+            [f'#include "{x}"' for x in self._header_filenames])
 
-        command = f'gcc -w -E {self.compile_defines} {headers}'
+        amalgamated_header_filename = self._make_gen_filename('amalgamated_headers.h')
+
+        with open(amalgamated_header_filename, 'wt') as f:
+            f.write(headers)
+
+        command = f'gcc -w -E {self.compile_defines} {amalgamated_header_filename}'
         if self._verbose:
             print(f'_preprocess_headers: {command}')
 
@@ -223,7 +228,14 @@ class Tube:
             print(f'gen folder: {self._gen_foldername}')
 
         ffibuilder = FFI()
-        ffibuilder.cdef(self._cdef)
+
+        try:
+            ffibuilder.cdef(self._cdef)
+        except:
+            print(self._cdef)
+            raise RuntimeError("invalid cdef")
+        
+        
         ffibuilder.set_source(self._module_name,
                               headers,
                               sources=source_filenames,
