@@ -238,7 +238,7 @@ class Tube:
                 tmpdir=self._gen_foldername,
                 verbose=self._verbose)
         except:
-            self._lib_path = None
+            raise RuntimeError('Compilation failed')
 
         if self._verbose:
             print(f'lib: {self._lib_path}')
@@ -348,7 +348,7 @@ class Tube:
         try:
             module = import_module(self._module_name)
         except:
-            return None
+            raise RuntimeError('Unable to load module')
 
         reload(module)
         self._lib = module.lib
