@@ -233,9 +233,12 @@ class Tube:
                               library_dirs=[],
                               )
 
-        self._lib_path = ffibuilder.compile(
-            tmpdir=self._gen_foldername,
-            verbose=self._verbose)
+        try:
+            self._lib_path = ffibuilder.compile(
+                tmpdir=self._gen_foldername,
+                verbose=self._verbose)
+        except:
+            self._lib_path = None
 
         if self._verbose:
             print(f'lib: {self._lib_path}')
@@ -342,7 +345,11 @@ class Tube:
         from sys import path
         path.append(self._gen_foldername)
 
-        module = import_module(self._module_name)
+        try:
+            module = import_module(self._module_name)
+        except:
+            return None
+
         reload(module)
         self._lib = module.lib
         self._ffi = module.ffi

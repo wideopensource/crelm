@@ -197,3 +197,14 @@ class TestMacros(TestCase, Factory):
 
         with self.assertRaises(AttributeError):
             sut.test_source_text_with_missing_conditional_compiler_macro_raises()
+
+
+class TestCompilerError(TestCase, Factory):
+    def test_cdef_text(self):
+        sut = self.create_Tube(self.testName) \
+            .verbose() \
+            .add_source_text(f'this wont compile') \
+            .squeeze()
+
+        self.assertIsNone(sut)
+
