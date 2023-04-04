@@ -4,11 +4,12 @@ from crelm import Factory
 
 class TestSqueeze(TestCase, Factory):
 
-    def test_squeeze_without_source_raises(self):
+    def test_squeeze_without_source_returns_None(self):
         tube = self.create_Tube(self.testName)
 
-        with self.assertRaises(BaseException):
-            tube.squeeze()
+        paste = tube.squeeze()
+
+        self.assertIsNone(paste)
 
 
 class TestGenerateWithText(TestCase, Factory):
@@ -84,16 +85,17 @@ class TestPasteWithText(TestCase, Factory):
 
 class TestPasteWithFile(TestCase, Factory):
 
-    def test_source_file_without_header_raises(self):
+    def test_source_file_without_header_returns_None(self):
         source = self.writeFile('test.c', 'int test_file() { return 4; }')
 
         tube = self.create_Tube(self.testName) \
             .add_source_file(source)
 
-        with self.assertRaises(BaseException):
-            tube.squeeze()
+        paste = tube.squeeze()
 
-    def test_source_file_with_bad_header_raises(self):
+        self.assertIsNone(paste)
+
+    def test_source_file_with_bad_header_returns_None(self):
         header = self.writeFile('test.h', 'int bad_test_file();')
         source = self.writeFile('test.c', 'int test_file() { return 4; }')
 
@@ -101,8 +103,7 @@ class TestPasteWithFile(TestCase, Factory):
             .add_header_file(header) \
             .add_source_file(source)
 
-        with self.assertRaises(BaseException):
-            sut.squeeze()
+        self.assertIsNone(sut.squeeze())
 
     def test_source_file_with_header(self):
         header = self.writeFile('test.h', 'int test_file();')
@@ -242,11 +243,12 @@ class TestMacros(TestCase, Factory):
         with self.assertRaises(AttributeError):
             sut.test_source_text_with_missing_conditional_compiler_macro_raises()
 
+
 class TestCompilerError(TestCase, Factory):
-    def test_cdef_text(self):
-        with self.assertRaises(RuntimeError):
-            self.create_Tube(self.testName) \
-                .add_source_text(f'this wont compile') \
-                .squeeze()
+    def test_cdef_text_error_returns_None(self):
 
+        paste = self.create_Tube(self.testName) \
+            .add_source_text(f'this wont compile') \
+            .squeeze()
 
+        self.assertIsNone(paste)

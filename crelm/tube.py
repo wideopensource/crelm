@@ -121,7 +121,8 @@ class Tube:
         headers = '\n'.join(
             [f'#include "{x}"' for x in self._header_filenames])
 
-        amalgamated_header_filename = self._make_gen_filename('amalgamated_headers.h')
+        amalgamated_header_filename = self._make_gen_filename(
+            'amalgamated_headers.h')
 
         with open(amalgamated_header_filename, 'wt') as f:
             f.write(headers)
@@ -204,13 +205,16 @@ class Tube:
             print(f'source_text: {self._source_text}')
 
         if 0 == (len(self._source_filenames) + len(self._source_text)):
-            raise RuntimeError("No sources specified")
+            print("No sources specified")
+            return None
 
         if 0 != len(self._source_filenames) and 0 == (len(self._header_filenames) + len(self._header_text)):
-            raise RuntimeError("Source file supplied without header")
+            print("Source file supplied without header")
+            return None
 
         if not self._generate():
-            raise RuntimeError("Failed to generate")
+            print("Failed to generate")
+            return None
 
         source_filenames = self._source_filenames + \
             [self._make_gen_filename(self._generated_source_filename)]
@@ -233,9 +237,9 @@ class Tube:
             ffibuilder.cdef(self._cdef)
         except:
             print(self._cdef)
-            raise RuntimeError("invalid cdef")
-        
-        
+            print("invalid cdef")
+            return None
+
         ffibuilder.set_source(self._module_name,
                               headers,
                               sources=source_filenames,
@@ -250,7 +254,8 @@ class Tube:
                 tmpdir=self._gen_foldername,
                 verbose=self._verbose)
         except:
-            raise RuntimeError('Compilation failed')
+            print('Compilation failed')
+            return None
 
         if self._verbose:
             print(f'lib: {self._lib_path}')
@@ -362,7 +367,10 @@ class Tube:
 
     def squeeze(self, build: bool = True) -> TSelf:
         if build:
-            self._build()
+            try:
+                self._build()
+            except:
+                return None
 
         from sys import path
         path.append(self._gen_foldername)
@@ -370,7 +378,8 @@ class Tube:
         try:
             module = import_module(self._module_name)
         except:
-            raise RuntimeError('Unable to load module')
+            print('Unable to load module')
+            return None
 
         reload(module)
         self._lib = module.lib
