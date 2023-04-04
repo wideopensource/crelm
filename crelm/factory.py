@@ -55,7 +55,7 @@ class Factory:
         return Tube(f'crelm_{"debug" if debug else "release"}') \
             .verbose(verbose) \
             .set_gen_folder(path) \
-            .set_source_folder_from(__file__) \
+            .set_source_folder_relative(__file__) \
             .add_header_text('int make_header(char const *source, char *header);') \
             .add_source_file('makeheaders_crelm.c') \
             .add_macro_if(debug, 'DEBUG') \

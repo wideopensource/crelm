@@ -37,7 +37,7 @@ class PiInfiniteSeries(InfiniteSeries):
                           100).fill_log().smooth().get()
 
         paste = factory.create_Tube(f'infinite_series_{self.name}') \
-            .set_source_folder_from(__file__) \
+            .set_source_folder_relative(__file__) \
             .add_header_file('pi.h') \
             .add_source_file('pi.c') \
             .add_macros([f'USE_{self._algorithm.name}',  f'USE_{self._type.name}']) \

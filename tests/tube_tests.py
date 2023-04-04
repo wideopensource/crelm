@@ -167,7 +167,7 @@ class TestPasteWithFiles(TestCase, Factory):
                                      f'int test() {{ return {expected}; }}')
 
         sut = self.create_Tube(self.testName) \
-            .set_source_folder_from(source_file) \
+            .set_source_folder_relative(source_file) \
             .add_source_and_header_file('test_source_and_header_file') \
             .squeeze()
 
@@ -190,7 +190,7 @@ class TestPasteWithFiles(TestCase, Factory):
                                       f'int test2() {{ return {expected2}; }}')
 
         sut = self.create_Tube(self.testName) \
-            .set_source_folder_from(source_file1) \
+            .set_source_folder_relative(source_file1) \
             .add_source_and_header_files([
                 'test_source_and_header_file1',
                 'test_source_and_header_file2']) \
@@ -206,19 +206,25 @@ class TestPasteWithFiles(TestCase, Factory):
 class TestMacros(TestCase, Factory):
 
     def test_source_text_with_source_macro(self):
-        actual = self.create_Tube(self.testName) \
+        sut = self.create_Tube(self.testName) \
             .add_source_text('#define NAME test_source_text_with_source_macro\nint NAME() { return 6; }') \
-            .squeeze() \
-            .test_source_text_with_source_macro()
+            .squeeze()
+
+        self.assertIsNotNone(sut)
+
+        actual = sut.test_source_text_with_source_macro()
 
         self.assertEqual(6, actual)
 
     def test_source_text_with_compiler_macro(self):
-        actual = self.create_Tube(self.testName) \
+        sut = self.create_Tube(self.testName) \
             .add_source_text('int NAME() { return 7; }') \
             .add_macro('NAME=test_source_text_with_compiler_macro') \
-            .squeeze() \
-            .test_source_text_with_compiler_macro()
+            .squeeze()
+
+        self.assertIsNotNone(sut)
+
+        actual = sut.test_source_text_with_compiler_macro()
 
         self.assertEqual(7, actual)
 
@@ -227,6 +233,8 @@ class TestMacros(TestCase, Factory):
             .add_source_text('int NAME() { return 8; }') \
             .add_macro_if(True, 'NAME=test_source_text_with_conditional_compiler_macro') \
             .squeeze()
+
+        self.assertIsNotNone(sut)
 
         actual = sut.test_source_text_with_conditional_compiler_macro()
 

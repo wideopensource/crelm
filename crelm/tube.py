@@ -197,7 +197,7 @@ class Tube:
         args += [f'-D{x}' for x in self._macros]
         return args
 
-    def _build(self) -> None:
+    def _build(self) -> bool:
         self._delete_file(self._module_name)
 
         if self._verbose:
@@ -205,16 +205,16 @@ class Tube:
             print(f'source_text: {self._source_text}')
 
         if 0 == (len(self._source_filenames) + len(self._source_text)):
-            print("No sources specified")
-            return None
+            print(f'{self._name}: No sources specified')
+            return False
 
         if 0 != len(self._source_filenames) and 0 == (len(self._header_filenames) + len(self._header_text)):
-            print("Source file supplied without header")
-            return None
+            print(f'{self._name}: Source file supplied without header')
+            return False
 
         if not self._generate():
-            print("Failed to generate")
-            return None
+            print(f'{self._name}: Failed to generate')
+            return False
 
         source_filenames = self._source_filenames + \
             [self._make_gen_filename(self._generated_source_filename)]
@@ -237,8 +237,8 @@ class Tube:
             ffibuilder.cdef(self._cdef)
         except:
             print(self._cdef)
-            print("invalid cdef")
-            return None
+            print(f'{self._name}: invalid cdef')
+            return False
 
         ffibuilder.set_source(self._module_name,
                               headers,
@@ -254,11 +254,13 @@ class Tube:
                 tmpdir=self._gen_foldername,
                 verbose=self._verbose)
         except:
-            print('Compilation failed')
-            return None
+            print(f'{self._name}: Compilation failed')
+            return False
 
         if self._verbose:
             print(f'lib: {self._lib_path}')
+
+        return True
 
     def verbose(self, v: bool = True) -> TSelf:
         self._verbose = v
@@ -276,12 +278,18 @@ class Tube:
         # self._gen_foldername = path
         return self
 
-    def set_source_folder(self, folder: str):
+    def set_source_folder(self, folder: str) -> TSelf:
         self._source_folder = folder
         return self
 
-    def set_source_folder_from(self, filename: str):
-        self.set_source_folder(dirname(realpath(filename)))
+    def set_source_folder_relative(self, filename: str, relative_path: str = None):
+        base_path = dirname(realpath(filename))
+
+        if relative_path:
+            self.set_source_folder(path_join(base_path, relative_path))
+        else:
+            self.set_source_folder(base_path)
+
         return self
 
     def add_header_file(self, filename: str) -> TSelf:
@@ -368,8 +376,11 @@ class Tube:
     def squeeze(self, build: bool = True) -> TSelf:
         if build:
             try:
-                self._build()
-            except:
+                if not self._build():
+                    print(f'{self._name}: build failed')
+                    return None
+            except BaseException as arg:
+                print(f'{self._name}: build failed ({arg})')
                 return None
 
         from sys import path
@@ -378,11 +389,16 @@ class Tube:
         try:
             module = import_module(self._module_name)
         except:
-            print('Unable to load module')
+            print(f'{self._name}: Unable to load module')
             return None
 
         reload(module)
         self._lib = module.lib
         self._ffi = module.ffi
 
-        return Tube.Paste(self)
+        paste = Tube.Paste(self)
+
+        if not paste:
+            print(f'{self._name}: paste is None')
+
+        return paste
