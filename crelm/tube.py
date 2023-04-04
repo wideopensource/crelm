@@ -303,6 +303,16 @@ class Tube:
             self.add_source_file(filename)
         return self
 
+    def add_source_and_header_file(self, filename: str) -> TSelf:
+        self.add_source_file(filename + '.c')
+        self.add_header_file(filename + '.h')
+        return self
+
+    def add_source_and_header_files(self, filenames: List[str]) -> TSelf:
+        for filename in filenames:
+            self.add_source_and_header_file(filename)
+        return self
+
     def add_source_text(self, text: str) -> TSelf:
         self._source_text += '\n' + text
         return self

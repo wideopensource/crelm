@@ -157,6 +157,50 @@ class TestPasteWithFiles(TestCase, Factory):
         self.assertEqual(1, actual1)
         self.assertEqual(2, actual2)
 
+    def test_source_and_header_file(self):
+        expected = 7
+
+        source_file = self.writeFile(
+            'test_source_and_header_file.h', 'int test();')
+        header_file = self.writeFile('test_source_and_header_file.c',
+                                     f'int test() {{ return {expected}; }}')
+
+        sut = self.create_Tube(self.testName) \
+            .set_source_folder_from(source_file) \
+            .add_source_and_header_file('test_source_and_header_file') \
+            .squeeze()
+
+        actual = sut.test()
+
+        self.assertEqual(expected, actual)
+
+    def test_source_and_header_files(self):
+        expected1 = 8
+        expected2 = 9
+
+        source_file1 = self.writeFile(
+            'test_source_and_header_file1.h', 'int test1();')
+        header_file1 = self.writeFile('test_source_and_header_file1.c',
+                                      f'int test1() {{ return {expected1}; }}')
+
+        source_file2 = self.writeFile(
+            'test_source_and_header_file2.h', 'int test2();')
+        header_file2 = self.writeFile('test_source_and_header_file2.c',
+                                      f'int test2() {{ return {expected2}; }}')
+
+        sut = self.create_Tube(self.testName) \
+            .set_source_folder_from(source_file1) \
+            .add_source_and_header_files([
+                'test_source_and_header_file1',
+                'test_source_and_header_file2']) \
+            .squeeze()
+
+        actual1 = sut.test1()
+        actual2 = sut.test2()
+
+        self.assertEqual(expected1, actual1)
+        self.assertEqual(expected2, actual2)
+
 
 class TestMacros(TestCase, Factory):
 
