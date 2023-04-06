@@ -388,8 +388,8 @@ class Tube:
 
         try:
             module = import_module(self._module_name)
-        except:
-            print(f'{self._name}: Unable to load module')
+        except Exception as error:
+            print(f'{self._name}: Unable to load module {error}')
             return None
 
         reload(module)
