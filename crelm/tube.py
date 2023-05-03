@@ -26,6 +26,7 @@ class Tube:
         self._source_text = ''
         self._header_text = ''
         self._macros = []
+        self._externs = []
         self._compiler_args = []
         self._lib_path = None
         self._temp_folderbame = path_join(gettempdir(), 'crelm')
@@ -180,6 +181,9 @@ class Tube:
             self._make_gen_filename(self._generated_header_filename)]
 
         self._cdef = self._preprocess_headers()
+
+        extern_python = '\n'.join([f'extern "Python" {x}' for x in self._externs])
+        self._cdef += '\n' + extern_python
 
         if self._verbose:
             print(f'cdef: {self._cdef}')
@@ -342,6 +346,16 @@ class Tube:
     def add_macro_if(self, predicate: bool, macro: str) -> TSelf:
         if predicate:
             self._macros.append(macro)
+        return self
+
+    def add_extern(self, extern: str) -> TSelf:
+        self._externs.append(extern)
+        return self
+
+    def add_externs(self, externs: List[str]) -> TSelf:
+        for extern in externs:
+            self.add_extern(extern)
+
         return self
 
     class Paste:
