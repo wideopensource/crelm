@@ -343,3 +343,13 @@ class TestPasteMetadata(TestCase, Factory):
             .typedef_decl('func_t')
 
         self.assertEqual('int(*)(int)', actual)
+
+    def test_function_decl_of_typedef(self):
+        actual = self.create_Tube(self.testName) \
+            .set_gen_folder(self.tempFolder) \
+            .add_header_text('typedef int (*func_t)(int);') \
+            .add_source_text('') \
+            .squeeze() \
+            .function_decl('func_t', 'test_func')
+
+        self.assertEqual('int test_func(int)', actual)

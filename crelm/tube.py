@@ -182,8 +182,7 @@ class Tube:
 
         self._cdef = self._preprocess_headers()
 
-        extern_python = '\n'.join(
-            [f'extern "Python" {x}' for x in self._externs])
+        extern_python = '\n'.join(self._externs)
         self._cdef += '\n' + extern_python
 
         if self._verbose:
@@ -227,11 +226,12 @@ class Tube:
         headers = self._build_headers()
         args = self._build_compiler_args()
 
-        if self._verbose:
+        if self._verbose or len(self._externs):
             print(f'module: {self._module_name}')
             print(f'cdef: {self._cdef}')
             print(f'headers: {headers}')
             print(f'sources: {source_filenames}')
+            print(f'externs: {self._externs}')
             print(f'args: {args}')
             print(f'verbose: {self._verbose}')
             print(f'gen folder: {self._gen_foldername}')
@@ -407,8 +407,11 @@ class Tube:
         def union_names(self):
             return self._tube._ffi.list_types()[2]
 
-        def typedef_decl(self, type_name:str, instance_name:str=''):
+        def typedef_decl(self, type_name: str, instance_name: str = ''):
             return self._tube._ffi.getctype(type_name, instance_name)
+
+        def function_decl(self, type_name: str, instance_name: str = ''):
+            return self.typedef_decl(type_name).replace('(*)', f' {instance_name}')
 
     def squeeze(self, build: bool = True) -> TSelf:
         if build:
