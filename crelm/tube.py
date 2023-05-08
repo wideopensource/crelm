@@ -182,7 +182,8 @@ class Tube:
 
         self._cdef = self._preprocess_headers()
 
-        extern_python = '\n'.join([f'extern "Python" {x}' for x in self._externs])
+        extern_python = '\n'.join(
+            [f'extern "Python" {x}' for x in self._externs])
         self._cdef += '\n' + extern_python
 
         if self._verbose:
@@ -386,14 +387,14 @@ class Tube:
 
         def string(self, var) -> str:
             return self._tube._ffi.string(var).decode('utf-8')
-        
+
         def str(self, cstr) -> str:
             return self.string(cstr)
 
         @property
         def null_pointer(self):
             return self._tube._ffi.NULL
-        
+
         @property
         def typedef_names(self):
             return self._tube._ffi.list_types()[0]
@@ -405,7 +406,6 @@ class Tube:
         @property
         def union_names(self):
             return self._tube._ffi.list_types()[2]
-
 
     def squeeze(self, build: bool = True) -> TSelf:
         if build:
