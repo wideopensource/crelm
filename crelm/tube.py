@@ -407,6 +407,9 @@ class Tube:
         def union_names(self):
             return self._tube._ffi.list_types()[2]
 
+        def typedef_decl(self, type_name:str, instance_name:str=''):
+            return self._tube._ffi.getctype(type_name, instance_name)
+
     def squeeze(self, build: bool = True) -> TSelf:
         if build:
             try:

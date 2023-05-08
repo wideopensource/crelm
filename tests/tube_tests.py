@@ -303,3 +303,43 @@ class TestPasteMetadata(TestCase, Factory):
             .typedef_names
 
         self.assertEqual(['func_t'], actual)
+
+    def test_typedef_decl(self):
+        actual = self.create_Tube(self.testName) \
+            .set_gen_folder(self.tempFolder) \
+            .add_header_text('typedef unsigned int uint_t;') \
+            .add_source_text('') \
+            .squeeze() \
+            .typedef_decl('uint_t', 'test_uint')
+
+        self.assertEqual('unsigned int test_uint', actual)
+
+    def test_typedef_decl_without_name(self):
+        actual = self.create_Tube(self.testName) \
+            .set_gen_folder(self.tempFolder) \
+            .add_header_text('typedef unsigned int uint_t;') \
+            .add_source_text('') \
+            .squeeze() \
+            .typedef_decl('uint_t')
+
+        self.assertEqual('unsigned int', actual)
+
+    def test_function_typedef_decl(self):
+        actual = self.create_Tube(self.testName) \
+            .set_gen_folder(self.tempFolder) \
+            .add_header_text('typedef int (*func_t)(int);') \
+            .add_source_text('') \
+            .squeeze() \
+            .typedef_decl('func_t', 'test_func_t')
+
+        self.assertEqual('int(* test_func_t)(int)', actual)
+
+    def test_function_typedef_decl_without_name(self):
+        actual = self.create_Tube(self.testName) \
+            .set_gen_folder(self.tempFolder) \
+            .add_header_text('typedef int (*func_t)(int);') \
+            .add_source_text('') \
+            .squeeze() \
+            .typedef_decl('func_t')
+
+        self.assertEqual('int(*)(int)', actual)
