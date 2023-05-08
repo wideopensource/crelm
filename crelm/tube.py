@@ -384,8 +384,16 @@ class Tube:
 
             return None
 
-        def string(self, var):
+        def string(self, var) -> str:
             return self._tube._ffi.string(var).decode('utf-8')
+        
+        def str(self, cstr) -> str:
+            return self.string(cstr)
+
+        @property
+        def null_pointer(self):
+            return self._tube._ffi.NULL
+
 
     def squeeze(self, build: bool = True) -> TSelf:
         if build:
