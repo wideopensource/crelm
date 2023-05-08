@@ -293,3 +293,13 @@ class TestPasteMetadata(TestCase, Factory):
             .typedef_names
 
         self.assertEqual(['test_typedef_t'], actual)
+
+    def test_function_typedef_name(self):
+        actual = self.create_Tube(self.testName) \
+            .set_gen_folder(self.tempFolder) \
+            .add_header_text('typedef int (*func_t)(int);') \
+            .add_source_text('') \
+            .squeeze() \
+            .typedef_names
+
+        self.assertEqual(['func_t'], actual)
