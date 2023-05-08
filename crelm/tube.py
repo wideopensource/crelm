@@ -393,6 +393,18 @@ class Tube:
         @property
         def null_pointer(self):
             return self._tube._ffi.NULL
+        
+        @property
+        def typedef_names(self):
+            return self._tube._ffi.list_types()[0]
+
+        @property
+        def struct_names(self):
+            return self._tube._ffi.list_types()[1]
+
+        @property
+        def union_names(self):
+            return self._tube._ffi.list_types()[2]
 
 
     def squeeze(self, build: bool = True) -> TSelf:

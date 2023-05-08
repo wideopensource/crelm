@@ -260,3 +260,36 @@ class TestCompilerError(TestCase, Factory):
             .squeeze()
 
         self.assertIsNone(paste)
+
+
+class TestPasteMetadata(TestCase, Factory):
+
+    def test_one_struct_name(self):
+        actual = self.create_Tube(self.testName) \
+            .set_gen_folder(self.tempFolder) \
+            .add_header_text('struct test_struct_t {};') \
+            .add_source_text('') \
+            .squeeze() \
+            .struct_names
+
+        self.assertEqual(['test_struct_t'], actual)
+
+    def test_one_union_name(self):
+        actual = self.create_Tube(self.testName) \
+            .set_gen_folder(self.tempFolder) \
+            .add_header_text('union test_union_t {};') \
+            .add_source_text('') \
+            .squeeze() \
+            .union_names
+
+        self.assertEqual(['test_union_t'], actual)
+
+    def test_one_typedef_name(self):
+        actual = self.create_Tube(self.testName) \
+            .set_gen_folder(self.tempFolder) \
+            .add_header_text('typedef int test_typedef_t;') \
+            .add_source_text('') \
+            .squeeze() \
+            .typedef_names
+
+        self.assertEqual(['test_typedef_t'], actual)
