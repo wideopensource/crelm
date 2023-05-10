@@ -226,7 +226,7 @@ class Tube:
         headers = self._build_headers()
         args = self._build_compiler_args()
 
-        if self._verbose or len(self._externs):
+        if self._verbose:
             print(f'module: {self._module_name}')
             print(f'cdef: {self._cdef}')
             print(f'headers: {headers}')
@@ -350,7 +350,7 @@ class Tube:
         return self
 
     def add_extern(self, extern: str) -> TSelf:
-        self._externs.append(extern)
+        self._externs.append(f'extern "Python" {extern}')
         return self
 
     def add_externs(self, externs: List[str]) -> TSelf:
