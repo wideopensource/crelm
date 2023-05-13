@@ -385,11 +385,8 @@ class Tube:
 
             return None
 
-        def string(self, var) -> str:
-            return self._tube._ffi.string(var).decode('utf-8')
-
         def str(self, cstr) -> str:
-            return self.string(cstr)
+            return self._tube._ffi.string(cstr).decode('utf-8')
 
         @property
         def null_pointer(self):
@@ -412,6 +409,9 @@ class Tube:
 
         def function_decl(self, type_name: str, instance_name: str = ''):
             return self.typedef_decl(type_name).replace('(*)', f' {instance_name}')
+
+        def struct_decl(self, type_name: str, instance_name: str = ''):
+            return self.typedef_decl(type_name)
 
     def squeeze(self, build: bool = True) -> TSelf:
         if build:
