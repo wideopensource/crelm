@@ -279,7 +279,7 @@ class Tube:
         self._compiler_args.append('-save-temps=obj')
         return self
 
-    def set_gen_folder(self, path: str) -> TSelf:
+    def set_gen_folder(self, path: str) -> TSelf: # todo foss: something about this
         # self._gen_foldername = path
         return self
 
