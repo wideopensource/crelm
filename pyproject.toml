@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "crelm"
-version = "0.0.33"
+version = "0.0.35"
 description = "Utility that automates turning simple C classes into Python objects"
 authors = [
   "WideOpenTech <foss@wideopentech.co.uk>",

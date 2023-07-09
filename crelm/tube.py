@@ -23,6 +23,7 @@ class Tube:
         self._imports = []
         self._header_filenames = []
         self._source_filenames = []
+        self._include_dirs = []
         self._source_text = ''
         self._header_text = ''
         self._macros = []
@@ -122,13 +123,15 @@ class Tube:
         headers = '\n'.join(
             [f'#include "{x}"' for x in self._header_filenames])
 
+        include_dirs = ' '.join([f'-I {x}' for x in self._include_dirs])
+                                
         amalgamated_header_filename = self._make_gen_filename(
             'amalgamated_headers.h')
 
         with open(amalgamated_header_filename, 'wt') as f:
             f.write(headers)
 
-        command = f'gcc -w -E {self.compile_defines} {amalgamated_header_filename}'
+        command = f'gcc -w -E {self.compile_defines} {include_dirs} {amalgamated_header_filename}'
         if self._verbose:
             print(f'_preprocess_headers: {command}')
 
@@ -231,6 +234,7 @@ class Tube:
             print(f'cdef: {self._cdef}')
             print(f'headers: {headers}')
             print(f'sources: {source_filenames}')
+            print(f'include dirs: {self._include_dirs}')
             print(f'externs: {self._externs}')
             print(f'args: {args}')
             print(f'verbose: {self._verbose}')
@@ -240,9 +244,9 @@ class Tube:
 
         try:
             ffibuilder.cdef(self._cdef)
-        except:
+        except BaseException as arg:
             print(self._cdef)
-            print(f'{self._name}: invalid cdef')
+            print(f'{self._name}: invalid cdef ({arg})')
             return False
 
         ffibuilder.set_source(self._module_name,
@@ -250,7 +254,7 @@ class Tube:
                               sources=source_filenames,
                               extra_compile_args=args,
                               libraries=[],
-                              include_dirs=[],
+                              include_dirs=self._include_dirs,
                               library_dirs=[],
                               )
 
@@ -333,6 +337,16 @@ class Tube:
 
     def add_source_text(self, text: str) -> TSelf:
         self._source_text += '\n' + text
+        return self
+
+    def add_include_dir_relative(self, dir: str) -> TSelf:
+        fullpath = self._make_source_fullpath(dir)
+        self._include_dirs.append(fullpath)
+        return self
+
+    def add_include_dir(self, dir: str) -> TSelf:
+        path = realpath(dir)
+        self._include_dirs.append(path)
         return self
 
     def add_macro(self, macro: str) -> TSelf:
@@ -426,10 +440,13 @@ class Tube:
         from sys import path
         path.append(self._gen_foldername)
 
+        if self._verbose:
+            print(f'loading module {self._module_name} from {self._gen_foldername}...')
+
         try:
             module = import_module(self._module_name)
-        except Exception as error:
-            print(f'{self._name}: Unable to load module {error}')
+        except BaseException as arg:
+            print(f'{self._name}: Unable to load module ({arg})')
             return None
 
         reload(module)
