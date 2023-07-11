@@ -262,8 +262,8 @@ class Tube:
             self._lib_path = ffibuilder.compile(
                 tmpdir=self._gen_foldername,
                 verbose=self._verbose)
-        except:
-            print(f'{self._name}: Compilation failed')
+        except BaseException as arg:
+            print(f'{self._name}: Compilation failed ({arg})')
             return False
 
         if self._verbose:
