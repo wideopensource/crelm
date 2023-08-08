@@ -349,6 +349,12 @@ class Tube:
         self._include_dirs.append(path)
         return self
 
+    def add_include_dirs(self, dirs: List[str]) -> TSelf:
+        for dir in dirs:
+            path = realpath(dir)
+            self._include_dirs.append(path)
+        return self
+
     def add_macro(self, macro: str) -> TSelf:
         self._macros.append(macro)
         return self
